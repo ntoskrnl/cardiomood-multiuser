@@ -3,6 +3,7 @@ package com.cardiomood.group
 import android.app.Application
 import com.cardiomood.group.api.Api
 import com.cardiomood.group.api.GroupInfo
+import com.cardiomood.group.api.ParseRequestInterceptor
 import com.cardiomood.group.mvp.PresenterContainer
 import com.cardiomood.group.mvp.PresenterScopeAware
 import com.cardiomood.group.screen.entry.EntryModel

@@ -1,4 +1,4 @@
-package com.cardiomood.group
+package com.cardiomood.group.api
 
 import okhttp3.Interceptor
 import okhttp3.Response
