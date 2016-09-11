@@ -24,10 +24,11 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cardiomood.group.R;
+
 import java.util.ArrayList;
 
 import ru.test.multydevicetest.DeviceService;
-import ru.test.multydevicetest.R;
 import ru.test.multydevicetest.bluetooth.BluetoothGattWrapper;
 import ru.test.multydevicetest.bluetooth.BluetoothStat;
 import ru.test.multydevicetest.bluetooth.SensorDevice;

@@ -14,4 +14,16 @@
     <color name="colorPrimaryDark">@color/primary_dark</color>
     <color name="colorAccent">@color/accent</color>
 
+    <color name="black_overlay">#66000000</color>
+    <color name="connecting">#CCCCFF</color>
+    <color name="connected">#CCCCFF</color>
+    <color name="transmitting">#CCCCFF</color>
+    <color name="disconnecting">#CCCCCC</color>
+    <color name="disconnected">#CCCCCC</color>
+    <color name="closed">#CCCCCC</color>
+    <color name="latency_good">#88CC88</color>
+    <color name="latency_warning">#EEEE44</color>
+    <color name="latency_bad">#EE8888</color>
+    <color name="unsupported">#777777</color>
+
 </resources>

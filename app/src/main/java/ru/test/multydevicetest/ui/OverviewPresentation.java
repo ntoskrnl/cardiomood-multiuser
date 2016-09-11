@@ -9,7 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
-import ru.test.multydevicetest.R;
+import com.cardiomood.group.R;
 
 /**
  * Created by Bes on 17.08.2016.

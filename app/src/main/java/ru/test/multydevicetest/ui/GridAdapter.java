@@ -8,10 +8,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.cardiomood.group.R;
+
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import ru.test.multydevicetest.R;
 import ru.test.multydevicetest.bluetooth.SensorDevice;
 
 /**

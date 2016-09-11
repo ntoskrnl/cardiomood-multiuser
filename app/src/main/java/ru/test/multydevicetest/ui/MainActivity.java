@@ -23,11 +23,12 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cardiomood.group.R;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import ru.test.multydevicetest.DeviceService;
-import ru.test.multydevicetest.R;
 import ru.test.multydevicetest.bluetooth.SensorDevice;
 
 public class MainActivity extends ListActivity {

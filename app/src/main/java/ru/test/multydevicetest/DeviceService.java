@@ -14,6 +14,8 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
+import com.cardiomood.group.R;
+
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -21,7 +23,7 @@ import java.util.Set;
 
 import ru.test.multydevicetest.bluetooth.IDeviceEventListener;
 import ru.test.multydevicetest.bluetooth.SensorDevice;
-import ru.test.multydevicetest.deviceManagers.AbstractDeviceManager;
+import ru.test.multydevicetest.devicemanagers.AbstractDeviceManager;
 import ru.test.multydevicetest.ui.OverviewActivity;
 
 public class DeviceService extends Service implements IDeviceEventListener {
@@ -293,7 +295,7 @@ public class DeviceService extends Service implements IDeviceEventListener {
         try {
             Log.i(TAG, "using device manager : " + AbstractDeviceManager.deviceManagerClass.getName());
             this.deviceManager = AbstractDeviceManager.deviceManagerClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (Exception e) {
             Log.e(TAG, "could'not instantiate device manager of class " + AbstractDeviceManager.deviceManagerClass.getName());
         }
         this.deviceManager.start();

@@ -5,11 +5,11 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
 import android.util.Log;
 
+import com.cardiomood.group.R;
+
 import java.lang.reflect.Constructor;
 import java.util.Calendar;
 import java.util.UUID;
-
-import ru.test.multydevicetest.R;
 
 /**
  * Created by Bes on 18.08.2016.
