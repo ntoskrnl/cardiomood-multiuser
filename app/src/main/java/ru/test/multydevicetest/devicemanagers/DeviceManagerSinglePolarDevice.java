@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import ru.test.multydevicetest.bluetooth.HeartRateListener;
 import ru.test.multydevicetest.bluetooth.IDeviceEventListener;
 import ru.test.multydevicetest.bluetooth.SensorDevice;
 
@@ -148,5 +149,10 @@ public class DeviceManagerSinglePolarDevice extends AbstractDeviceManager {
     @Override
     public int maxActiveDec() {
         return 1;
+    }
+
+    @Override
+    public void setHeartRateListener(HeartRateListener listener) {
+        // this implementation doesn't support this type of listener
     }
 }

@@ -143,6 +143,8 @@ public abstract class SensorDevice {
     protected DutyCycleTime lastDutyCycle = new DutyCycleTime();
     private DutyCycleTime curDutyCycle = new DutyCycleTime();
 
+    protected HeartRateListener heartRateListener = null;
+
     protected boolean keepClosed = false;
 
     protected abstract String tag();
@@ -268,6 +270,10 @@ public abstract class SensorDevice {
     }
 
     public void close(){close(false);}
+
+    public void setHeartRateListener(HeartRateListener listener) {
+        heartRateListener = listener;
+    }
 
     public abstract boolean connect();
     public abstract void disconnect();

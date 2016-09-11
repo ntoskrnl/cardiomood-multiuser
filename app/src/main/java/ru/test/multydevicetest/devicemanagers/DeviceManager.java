@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import ru.test.multydevicetest.DeviceService;
+import ru.test.multydevicetest.bluetooth.HeartRateListener;
 import ru.test.multydevicetest.bluetooth.IDeviceEventListener;
 import ru.test.multydevicetest.bluetooth.SensorDevice;
 
@@ -29,6 +30,8 @@ public class DeviceManager extends AbstractDeviceManager {
     protected boolean isRunning = true;
 
     protected int maxActiveDevices = 7;
+
+    private HeartRateListener heartRateListener = null;
 
     /**
      * Calls the <code>run()</code> method of the Runnable object the receiver
@@ -173,7 +176,9 @@ public class DeviceManager extends AbstractDeviceManager {
     public boolean addDevice(BluetoothDevice device, Context ctx, IDeviceEventListener listener) {
         if(device == null) return false;
         if(sensorDevices.containsKey(device.getAddress())) return false;
-        sensorDevices.put(device.getAddress(),SensorDevice.newInstance(ctx,device,listener));
+        SensorDevice sensor = SensorDevice.newInstance(ctx,device,listener);
+        sensor.setHeartRateListener(heartRateListener);
+        sensorDevices.put(device.getAddress(), sensor);
         sensorDevices.get(device.getAddress()).deviceManagerId = sensorDevices.size() - 1;
         Log.d(TAG, "added device: " + device.getName() + " with address " + device.getAddress());
         return true;
@@ -224,5 +229,11 @@ public class DeviceManager extends AbstractDeviceManager {
     public int maxActiveDec() {
         if(maxActiveDevices > 1) maxActiveDevices--;
         return maxActiveDevices;
+    }
+
+    public void setHeartRateListener(HeartRateListener listener) {
+        heartRateListener = listener;
+        for (SensorDevice sensor: allDevices())
+            sensor.setHeartRateListener(heartRateListener);
     }
 }

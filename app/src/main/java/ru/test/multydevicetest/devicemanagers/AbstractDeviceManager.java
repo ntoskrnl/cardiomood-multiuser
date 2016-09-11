@@ -6,6 +6,7 @@ import android.content.Context;
 import java.util.Collection;
 import java.util.Set;
 
+import ru.test.multydevicetest.bluetooth.HeartRateListener;
 import ru.test.multydevicetest.bluetooth.IDeviceEventListener;
 import ru.test.multydevicetest.bluetooth.SensorDevice;
 
@@ -48,4 +49,6 @@ public abstract class AbstractDeviceManager extends Thread{
     public abstract int maxActiveInc();
 
     public abstract int maxActiveDec();
+
+    public abstract void setHeartRateListener(HeartRateListener listener);
 }

@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import ru.test.multydevicetest.bluetooth.HeartRateListener;
 import ru.test.multydevicetest.bluetooth.IDeviceEventListener;
 import ru.test.multydevicetest.bluetooth.SensorDevice;
 
@@ -146,5 +147,9 @@ public class DeviceManagerSimple extends AbstractDeviceManager {
         return maxActiveDevices;
     }
 
+    @Override
+    public void setHeartRateListener(HeartRateListener listener) {
+        // this implementation doesn't support this type of listener
+    }
 
 }

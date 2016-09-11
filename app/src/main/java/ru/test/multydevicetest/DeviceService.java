@@ -16,11 +16,14 @@ import android.util.Log;
 
 import com.cardiomood.group.R;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Method;
-import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import ru.test.multydevicetest.bluetooth.HeartRateListener;
 import ru.test.multydevicetest.bluetooth.IDeviceEventListener;
 import ru.test.multydevicetest.bluetooth.SensorDevice;
 import ru.test.multydevicetest.devicemanagers.AbstractDeviceManager;
@@ -29,8 +32,6 @@ import ru.test.multydevicetest.ui.OverviewActivity;
 public class DeviceService extends Service implements IDeviceEventListener {
 
     private final static String TAG = DeviceService.class.getSimpleName();
-
-    public static final String SERVER_ADDRESS = "http://192.168.2.96:8881/Log/Write";
 
     public static final String PREFIX = DeviceService.class.getPackage().getName() + ".";
     public final static String EXTRA_HEART_RATE = PREFIX + "EXTRA_HEART_RATE";
@@ -54,7 +55,7 @@ public class DeviceService extends Service implements IDeviceEventListener {
 
     protected PowerManager.WakeLock wakeLock;
     private AbstractDeviceManager deviceManager;
-    private DataManager dataManager;
+    private HeartRateListener heartRateListener;
     private long longestLatency = 0;
     private boolean isStarted = false;
     private SharedPreferences sharedPref;
@@ -63,7 +64,8 @@ public class DeviceService extends Service implements IDeviceEventListener {
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate");
-        dataManager = new DataManager(SERVER_ADDRESS);
+
+        heartRateListener = new DataCollector();
 
         sharedPref = getApplicationContext().getSharedPreferences(
                 "prefs",MODE_PRIVATE);
@@ -163,11 +165,7 @@ public class DeviceService extends Service implements IDeviceEventListener {
         //intent.putExtra(EXTRA_LATENCY, dutyCycle);
         //sendBroadcast(intent);
 
-        if (dataManager != null)
-            dataManager.addRecord(address, Calendar.getInstance().getTime(), heartRate);
-
         doUpdateStats();
-
     }
 
     @Override
@@ -191,10 +189,6 @@ public class DeviceService extends Service implements IDeviceEventListener {
 
         }
 
-        if (dataManager != null) {
-            dataManager.dispose();
-            dataManager = null;
-        }
         if(isExpected)
             shouldRun = false;
 
@@ -295,6 +289,7 @@ public class DeviceService extends Service implements IDeviceEventListener {
         try {
             Log.i(TAG, "using device manager : " + AbstractDeviceManager.deviceManagerClass.getName());
             this.deviceManager = AbstractDeviceManager.deviceManagerClass.newInstance();
+            this.deviceManager.setHeartRateListener(heartRateListener);
         } catch (Exception e) {
             Log.e(TAG, "could'not instantiate device manager of class " + AbstractDeviceManager.deviceManagerClass.getName());
         }
@@ -317,5 +312,13 @@ public class DeviceService extends Service implements IDeviceEventListener {
     public Set<String> getAllAddresses() {
         if(deviceManager == null) return new HashSet<>();
         return deviceManager.allAddresses();
+    }
+}
+
+class DataCollector implements HeartRateListener {
+
+    @Override
+    public void onDataReceived(@NotNull String address, int hr, @NotNull List<Integer> rrIntervals) {
+        Log.d("DataCollector", address + ": hr=" + hr + ", rrs=" + rrIntervals);
     }
 }

@@ -78,7 +78,17 @@ class SensorDeviceRx protected constructor(ctx: Context, device: BluetoothDevice
         //Log.d(tag(), "received notification: " + HexString.bytesToHex(bytes));
         if (!connectionState.isInStatus(Status.TRANSMITTING))
             connectionState.setStatus(Status.TRANSMITTING)
-        this.lastHeartRate = parseHeartRate(bytes)
+        val hasEnergy = (bytes[0].toInt() and (1 shl 3) != 0)
+        val offsetExtra = if (hasEnergy) 2 else 0
+        if (bytes[0].toInt() and 0x01 != 0) {
+            lastHeartRate = unsignedBytesToInt(bytes[1], bytes[2])
+            val rrIntervals = parseRrIntervals(bytes.drop(3 + offsetExtra))
+            heartRateListener?.onDataReceived(address, this.lastHeartRate, rrIntervals)
+        } else {
+            lastHeartRate = unsignedByteToInt(bytes[1])
+            val rrIntervals = parseRrIntervals(bytes.drop(2 + offsetExtra))
+            heartRateListener?.onDataReceived(address, this.lastHeartRate, rrIntervals)
+        }
 
         super.onDataReceived()
     }
@@ -101,14 +111,14 @@ class SensorDeviceRx protected constructor(ctx: Context, device: BluetoothDevice
         return unsignedByteToInt(b0) + (unsignedByteToInt(b1) shl 8)
     }
 
-    private fun parseHeartRate(bytes: ByteArray): Int {
-        if (bytes[0].toInt() and 0x01 != 0) {
-            return unsignedBytesToInt(bytes[1], bytes[2])
-            //Log.d(tag(), "Heart rate format UINT16.");
-        } else {
-            return unsignedByteToInt(bytes[1])
-            //Log.d(tag(), "Heart rate format UINT8.");
+    private fun parseRrIntervals(bytes: List<Byte>): List<Int> {
+        assert(bytes.size % 2 == 0)
+        val result = mutableListOf<Int>()
+        for (i in bytes.indices.step(2)) {
+            val rr = unsignedBytesToInt(bytes[i], bytes[i+1])
+            result.add(Math.round(rr * 1024f / 1000))
         }
+        return result
     }
 
     override fun disconnect() {
