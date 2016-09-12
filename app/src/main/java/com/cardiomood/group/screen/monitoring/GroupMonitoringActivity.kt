@@ -35,7 +35,7 @@ class GroupMonitoringActivity : BaseActivity() {
     private val view by injector.instance<GroupMonitoringView>()
 
     private lateinit var bluetoothAdapter: BluetoothAdapter
-    private var bluetoothLeService: DeviceService? = null
+    var bluetoothLeService: DeviceService? = null
 
     private val scanHandler = Handler()
     private var isScanning = false
@@ -142,7 +142,7 @@ class GroupMonitoringActivity : BaseActivity() {
         }
     }
 
-    private fun doScan(enable: Boolean) {
+    fun doScan(enable: Boolean) {
         if (enable) {
             if (isScanning)
                 return

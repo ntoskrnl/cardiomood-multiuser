@@ -1,30 +1,30 @@
 <resources>
     <string name="app_name">HRV Group</string>
 
-    <string name="title">Устройства</string>
-    <string name="unknown_device">Неизвестное устройство</string>
-    <string name="unknown_status">неизвестно</string>
-    <string name="unsupported_status">Не поддерживается</string>
-    <string name="error_status">Ошибка</string>
-    <string name="disconnected_status">Откючено</string>
-    <string name="connecting_status">Подключается</string>
-    <string name="connected_status">Подключено</string>
-    <string name="disconnecting_status">Отключается</string>
-    <string name="connected">Подключено</string>
-    <string name="disconnected">Отключено</string>
+    <string name="title">Devices</string>
+    <string name="unknown_device">Unknown device</string>
+    <string name="unknown_status">unknown</string>
+    <string name="unsupported_status">Not supported</string>
+    <string name="error_status">Error</string>
+    <string name="disconnected_status">Disconnected</string>
+    <string name="connecting_status">Connecting</string>
+    <string name="connected_status">Connected</string>
+    <string name="disconnecting_status">Disconnecting</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
 
     <string name="title_activity_overview">OverviewActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="device_total_count">Всего устройств :</string>
+    <string name="device_total_count">Total devices:</string>
     <string name="no_data">NA</string>
-    <string name="device_active_count">Активных устройств :</string>
-    <string name="device_longest_update">Наибольшее ожидание :</string>
+    <string name="device_active_count">Active devices:</string>
+    <string name="device_longest_update">Max latency :</string>
     <string name="latency_format" formatted="false">%.1fс</string>
     <string name="active_count_format" formatted="false">%d/%d</string>
-    <string name="menu_scan">Найти</string>
-    <string name="menu_stop">Стоп</string>
-    <string name="transmitting_status">Передача</string>
-    <string name="closing_status">Закрывается</string>
-    <string name="menu_exit">выход</string>
+    <string name="menu_scan">Find</string>
+    <string name="menu_stop">Stop</string>
+    <string name="transmitting_status">Connected</string>
+    <string name="closing_status">Closing</string>
+    <string name="menu_exit">exit</string>
 </resources>
