@@ -169,6 +169,11 @@ class GroupMonitoringActivity : BaseActivity() {
         invalidateOptionsMenu()
     }
 
+    override fun onBackPressed() {
+        bluetoothLeService?.doStop(true)
+        super.onBackPressed()
+    }
+
     private fun diConfig() = Kodein {
         extend(appKodein())
 

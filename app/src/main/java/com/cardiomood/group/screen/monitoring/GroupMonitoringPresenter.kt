@@ -28,10 +28,10 @@ class GroupMonitoringPresenter(groupState: BehaviorRelay<GroupInfo>) : BasePrese
     }
 
     private val userStateStream = presenterStream {
-        userListStream
+        userListStream.map { it.map { Pair<User, String?>(it, null) } }
                 .switchMap { users ->
                     Observable.combineLatest(
-                            deviceSelections.scan(users.map { Pair<User, String?>(it, null) }) {
+                            deviceSelections.scan(users) {
                                 a, b ->
                                 a.map {
                                     when (it.first) {

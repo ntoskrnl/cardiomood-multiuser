@@ -16,11 +16,8 @@ import android.util.Log;
 
 import com.cardiomood.group.R;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.lang.reflect.Method;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import ru.test.multydevicetest.bluetooth.HeartRateListener;
@@ -312,13 +309,5 @@ public class DeviceService extends Service implements IDeviceEventListener {
     public Set<String> getAllAddresses() {
         if(deviceManager == null) return new HashSet<>();
         return deviceManager.allAddresses();
-    }
-}
-
-class DataCollector implements HeartRateListener {
-
-    @Override
-    public void onDataReceived(@NotNull String address, int hr, @NotNull List<Integer> rrIntervals) {
-        Log.d("DataCollector", address + ": hr=" + hr + ", rrs=" + rrIntervals);
     }
 }
