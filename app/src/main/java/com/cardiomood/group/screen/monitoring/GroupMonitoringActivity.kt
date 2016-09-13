@@ -94,10 +94,13 @@ class GroupMonitoringActivity : BaseActivity() {
 
         val gattServiceIntent = Intent(this, DeviceService::class.java)
         bindService(gattServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+
+        doScan(true)
     }
 
     override fun onResume() {
         super.onResume()
+        presenter.attachView(view)
 
         // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
         // fire an intent to display a dialog asking the user to grant permission to enable it.
@@ -105,10 +108,6 @@ class GroupMonitoringActivity : BaseActivity() {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
         }
-
-        presenter.attachView(view)
-
-        doScan(true)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

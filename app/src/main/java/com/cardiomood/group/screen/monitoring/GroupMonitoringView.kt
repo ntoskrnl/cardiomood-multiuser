@@ -10,10 +10,12 @@ interface GroupMonitoringView {
 
     val deviceSelections: Observable<Pair<User, String>>
 
+    val devices: Observable<List<DeviceInfo>>
+
     val updateContent: Action1<List<MonitoredUser>>
 
     val updateTitle: Action1<String>
 
-    val selectDevice: Action1<User>
+    val selectDevice: Action1<Pair<User, List<String>>>
 
 }

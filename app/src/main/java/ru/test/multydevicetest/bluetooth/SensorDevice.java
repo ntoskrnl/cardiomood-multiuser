@@ -275,6 +275,10 @@ public abstract class SensorDevice {
         heartRateListener = listener;
     }
 
+    public int getLastHeartRate() {
+        return lastHeartRate;
+    }
+
     public abstract boolean connect();
     public abstract void disconnect();
     public abstract void close(boolean keepClosed);
