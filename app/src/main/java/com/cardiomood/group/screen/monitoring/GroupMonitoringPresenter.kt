@@ -5,8 +5,9 @@ import com.cardiomood.group.mvp.BasePresenter
 import com.jakewharton.rxrelay.BehaviorRelay
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
+import rx.lang.kotlin.filterNotNull
 
-class GroupMonitoringPresenter(groupState: BehaviorRelay<GroupInfo>) : BasePresenter<GroupMonitoringView, Nothing>() {
+class GroupMonitoringPresenter(val groupState: BehaviorRelay<GroupInfo?>) : BasePresenter<GroupMonitoringView, Nothing>() {
 
     private val allDevices = viewStream { view -> view.devices }
 
@@ -18,10 +19,10 @@ class GroupMonitoringPresenter(groupState: BehaviorRelay<GroupInfo>) : BasePrese
 
     private val clearPairingRequests = viewStream { view -> view.clearPairingRequests }
 
-    private val userListStream = presenterStream { groupState.map { it.users }.replay(1) }
+    private val userListStream = presenterStream { groupState.filterNotNull().map { it.users }.replay(1) }
 
     private val titleStream = presenterStream {
-        groupState.map { it.group.name }.replay(1)
+        groupState.filterNotNull().map { it.group.name }.replay(1)
     }
 
     private val deviceCache = presenterStream {
@@ -63,6 +64,14 @@ class GroupMonitoringPresenter(groupState: BehaviorRelay<GroupInfo>) : BasePrese
                     }
                 }
                 .publish()
+    }
+
+    override fun create() {
+        super.create()
+        presenterSubscription.addAll(
+                backReactionStream.filter { it == GoBackResolution.GO_TO_ENTRY }.
+                        subscribe { groupState.call(null) }
+        )
     }
 
     override fun attachView(view: GroupMonitoringView) {

@@ -58,7 +58,7 @@ class App : Application(), KodeinAware, PresenterScopeAware {
 
             bind<EntryModel>() with singleton { EntryModelImpl(instance()) }
 
-            bind<BehaviorRelay<GroupInfo>>() with singleton { BehaviorRelay.create<GroupInfo>() }
+            bind<BehaviorRelay<GroupInfo?>>() with singleton { BehaviorRelay.create<GroupInfo?>() }
 
         }
     }

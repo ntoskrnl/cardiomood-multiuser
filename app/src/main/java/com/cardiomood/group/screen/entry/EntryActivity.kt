@@ -16,7 +16,7 @@ class EntryActivity : BaseActivity() {
     private val appInjector = KodeinInjector()
     private val injector = KodeinInjector()
 
-    private val groupInfo by appInjector.instance<BehaviorRelay<GroupInfo>>()
+    private val groupInfo by appInjector.instance<BehaviorRelay<GroupInfo?>>()
     private val router by appInjector.instance<EntryRouter>()
     private val presenter by injector.instance<EntryPresenter>()
     private val view by injector.instance<EntryView>()
@@ -25,8 +25,8 @@ class EntryActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         appInjector.inject(diConfig())
 
-        if (groupInfo.hasValue()) {
-            router.gotoMainScreen(groupInfo.value, true)
+        if (groupInfo.value != null) {
+            router.gotoMainScreen(groupInfo.value!!, true)
             finish()
             return
         }

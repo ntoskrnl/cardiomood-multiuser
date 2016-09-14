@@ -10,7 +10,7 @@ import rx.schedulers.Schedulers
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-class EntryPresenter(private val model: EntryModel, private val groupState: BehaviorRelay<GroupInfo>) : BasePresenter<EntryView, EntryRouter>() {
+class EntryPresenter(private val model: EntryModel, private val groupState: BehaviorRelay<GroupInfo?>) : BasePresenter<EntryView, EntryRouter>() {
 
     private val CODE_PATTERN = Regex("[a-z0-9]{4,6}", RegexOption.IGNORE_CASE)
 
