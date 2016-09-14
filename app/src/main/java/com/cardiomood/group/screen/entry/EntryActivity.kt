@@ -2,26 +2,38 @@ package com.cardiomood.group.screen.entry
 
 import android.os.Bundle
 import com.cardiomood.group.R
+import com.cardiomood.group.api.GroupInfo
 import com.cardiomood.group.mvp.BaseActivity
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
 import com.github.salomonbrys.kodein.singleton
+import com.jakewharton.rxrelay.BehaviorRelay
 
 class EntryActivity : BaseActivity() {
 
+    private val appInjector = KodeinInjector()
     private val injector = KodeinInjector()
 
+    private val groupInfo by appInjector.instance<BehaviorRelay<GroupInfo>>()
+    private val router by appInjector.instance<EntryRouter>()
     private val presenter by injector.instance<EntryPresenter>()
     private val view by injector.instance<EntryView>()
-    private val router by injector.instance<EntryRouter>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_entry)
+        appInjector.inject(appKodein())
 
+        if (groupInfo.hasValue()) {
+            router.gotoMainScreen(groupInfo.value, true)
+            finish()
+            return
+        }
+
+        setContentView(R.layout.activity_entry)
         injector.inject(diConfig())
+
 
         presenter.attachRouter(router)
     }

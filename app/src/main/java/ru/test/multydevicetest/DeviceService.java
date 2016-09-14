@@ -15,16 +15,16 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import com.cardiomood.group.R;
+import com.cardiomood.group.api.User;
+import com.cardiomood.group.screen.monitoring.GroupMonitoringActivity;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import ru.test.multydevicetest.bluetooth.HeartRateListener;
 import ru.test.multydevicetest.bluetooth.IDeviceEventListener;
 import ru.test.multydevicetest.bluetooth.SensorDevice;
 import ru.test.multydevicetest.devicemanagers.AbstractDeviceManager;
-import ru.test.multydevicetest.ui.OverviewActivity;
 
 public class DeviceService extends Service implements IDeviceEventListener {
 
@@ -41,18 +41,18 @@ public class DeviceService extends Service implements IDeviceEventListener {
     public static final String EXTRA_MAX_LATENCY = PREFIX + "EXTRA_MAX_LATENCY";
     public static final String EXTRA_BATTERY_LEVEL = PREFIX + "EXTRA_BATTERY_LEVEL";
     //public static final String EXTRA_BLUETOOTH_STAT_EXTRA = PREFIX + "EXTRA_BLUETOOTH_STAT_EXTRA";
-    private static final String ADDRESSES = PREFIX +"ADDRESSES";
+    private static final String ADDRESSES = PREFIX + "ADDRESSES";
 
-    public static final String WAKELOCK_TAG = PREFIX +"WAKE_LOCK";
+    public static final String WAKELOCK_TAG = PREFIX + "WAKE_LOCK";
 
     private static final int ONGOING_NOTIFICATION_ID = 13;
 
-    private static boolean shouldRun =false;
+    private static boolean shouldRun = false;
 
 
     protected PowerManager.WakeLock wakeLock;
     private AbstractDeviceManager deviceManager;
-    private HeartRateListener heartRateListener;
+    private DataCollector dataCollector;
     private long longestLatency = 0;
     private boolean isStarted = false;
     private SharedPreferences sharedPref;
@@ -62,24 +62,22 @@ public class DeviceService extends Service implements IDeviceEventListener {
     public void onCreate() {
         Log.d(TAG, "onCreate");
 
-        heartRateListener = new DataCollector();
+        dataCollector = new DataCollector();
 
-        sharedPref = getApplicationContext().getSharedPreferences(
-                "prefs",MODE_PRIVATE);
+        sharedPref = getApplicationContext().getSharedPreferences("prefs", MODE_PRIVATE);
 
 
-        Intent intentForeground = new Intent(this, OverviewActivity.class)
+        Intent intentForeground = new Intent(this, GroupMonitoringActivity.class)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                         | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_RECEIVER_FOREGROUND);
 
-        PendingIntent pendIntent = PendingIntent.getActivity(this, 0,
-                intentForeground, 0);
+        PendingIntent pendIntent = PendingIntent.getActivity(this, 0, intentForeground, 0);
 
 
         Notification notification = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_notification_icon)
-                .setTicker("MultiDeviceTest")
-                .setContentTitle("Multiple Bluetooth Device test")
+                .setTicker("MultiUserTracker")
+                .setContentTitle("CardioMood multi-user monitor")
                 .setContentText("Touch to start overview")
                 .setContentIntent(pendIntent)
                 .setDefaults(Notification.DEFAULT_ALL).setOngoing(true)
@@ -89,8 +87,8 @@ public class DeviceService extends Service implements IDeviceEventListener {
         startForeground(ONGOING_NOTIFICATION_ID, notification);
 
 
-        PowerManager powerManager = (PowerManager)getSystemService(POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.PARTIAL_WAKE_LOCK,WAKELOCK_TAG);
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG);
         wakeLock.acquire();
 
         shouldRun = true;
@@ -102,16 +100,14 @@ public class DeviceService extends Service implements IDeviceEventListener {
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
 
-        if(shouldRun)
-        {
-            sharedPref.edit().putStringSet(ADDRESSES,deviceManager.allAddresses()).apply();
+        if (shouldRun) {
+            sharedPref.edit().putStringSet(ADDRESSES, deviceManager.allAddresses()).apply();
             doStop(false);
-        } else
-        {
-            sharedPref.edit().putStringSet(ADDRESSES,new HashSet<String>()).apply();
+        } else {
+            sharedPref.edit().putStringSet(ADDRESSES, new HashSet<String>()).apply();
         }
 
-        if(wakeLock != null && wakeLock.isHeld())
+        if (wakeLock != null && wakeLock.isHeld())
             wakeLock.release();
         super.onDestroy();
     }
@@ -174,11 +170,11 @@ public class DeviceService extends Service implements IDeviceEventListener {
         sendBroadcast(intent);
     }
 
-    public void doStop()
-    {
+    public void doStop() {
         doStop(true);
     }
-    public void doStop( boolean isExpected) {
+
+    public void doStop(boolean isExpected) {
         Log.d(TAG, "doStop, expected : " + isExpected);
         if (deviceManager != null) {
             deviceManager.doStop();
@@ -186,7 +182,7 @@ public class DeviceService extends Service implements IDeviceEventListener {
 
         }
 
-        if(isExpected)
+        if (isExpected)
             shouldRun = false;
 
 
@@ -194,22 +190,22 @@ public class DeviceService extends Service implements IDeviceEventListener {
     }
 
     public int getMaxActiveDevices() {
-        if(deviceManager == null) return 0;
+        if (deviceManager == null) return 0;
         return deviceManager.getMaxActiveDevices();
     }
 
     public int maxActiveCountInc() {
-        if(deviceManager == null) return 0;
+        if (deviceManager == null) return 0;
         return deviceManager.maxActiveInc();
     }
 
     public int maxActiveCountDec() {
-        if(deviceManager == null) return 0;
+        if (deviceManager == null) return 0;
         return deviceManager.maxActiveDec();
     }
 
     public void doUpdateStats() {
-        if(deviceManager == null) return;
+        if (deviceManager == null) return;
         Intent intent = new Intent(INFO_STATISTICS);
         intent.putExtra(EXTRA_TOTAL, deviceManager.countAllDevices());
         intent.putExtra(EXTRA_MAX_ACTIVE, getMaxActiveDevices());
@@ -226,22 +222,20 @@ public class DeviceService extends Service implements IDeviceEventListener {
     }
 
     public void onBluetoothOff() {
-        if(deviceManager == null) return;
+        if (deviceManager == null) return;
         deviceManager.closeAll();
     }
 
     public void onBluetoothOn() {
-        if(deviceManager == null) return;
+        if (deviceManager == null) return;
         deviceManager.resetAll();
     }
 
     public static boolean isRunning(Context context) {
-        if(context == null) return false;
-        ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-        for(ActivityManager.RunningServiceInfo serviceInfo : activityManager.getRunningServices(Integer.MAX_VALUE))
-        {
-            if(DeviceService.class.getName().equals(serviceInfo.service.getClassName()))
-            {
+        if (context == null) return false;
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo serviceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (DeviceService.class.getName().equals(serviceInfo.service.getClassName())) {
                 Log.i(TAG, "Service is running!");
                 return true;
             }
@@ -261,8 +255,20 @@ public class DeviceService extends Service implements IDeviceEventListener {
     }
 
     public SensorDevice getDevice(String address) {
-        if(deviceManager == null) return null;
+        if (deviceManager == null) return null;
         return deviceManager.getDevice(address);
+    }
+
+    public void pairDeviceWithUser(String address, User user) {
+        dataCollector.startRecording(address, user);
+    }
+
+    public void clearDevicePairing() {
+        dataCollector.resetPairing();
+    }
+
+    public User getUser(String address) {
+        return dataCollector.getUser(address);
     }
 
     private boolean initialize() {
@@ -281,33 +287,31 @@ public class DeviceService extends Service implements IDeviceEventListener {
         }
 
 
-
         if (this.deviceManager != null) deviceManager.doStop();
         try {
             Log.i(TAG, "using device manager : " + AbstractDeviceManager.deviceManagerClass.getName());
             this.deviceManager = AbstractDeviceManager.deviceManagerClass.newInstance();
-            this.deviceManager.setHeartRateListener(heartRateListener);
+            this.deviceManager.setHeartRateListener(dataCollector);
         } catch (Exception e) {
             Log.e(TAG, "could'not instantiate device manager of class " + AbstractDeviceManager.deviceManagerClass.getName());
         }
         this.deviceManager.start();
 
-        Set<String> savedAddresses = sharedPref.getStringSet(ADDRESSES,new HashSet<String>());
+        Set<String> savedAddresses = sharedPref.getStringSet(ADDRESSES, new HashSet<String>());
         BluetoothDevice device;
-        for(String address : savedAddresses)
-        {
+        for (String address : savedAddresses) {
             device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address);
-            if(device != null)
+            if (device != null)
                 addDevice(device);
         }
-        sharedPref.edit().putStringSet(ADDRESSES,new HashSet<String>()).apply();
+        sharedPref.edit().putStringSet(ADDRESSES, new HashSet<String>()).apply();
 
         return true;
 
     }
 
     public Set<String> getAllAddresses() {
-        if(deviceManager == null) return new HashSet<>();
+        if (deviceManager == null) return new HashSet<>();
         return deviceManager.allAddresses();
     }
 }

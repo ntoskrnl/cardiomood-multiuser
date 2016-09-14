@@ -1,7 +1,6 @@
 package com.cardiomood.group.screen.monitoring
 
 import com.cardiomood.group.api.GroupInfo
-import com.cardiomood.group.api.User
 import com.cardiomood.group.mvp.BasePresenter
 import com.jakewharton.rxrelay.BehaviorRelay
 import rx.Observable
@@ -14,6 +13,10 @@ class GroupMonitoringPresenter(groupState: BehaviorRelay<GroupInfo>) : BasePrese
     private val itemClicks = viewStream { view -> view.itemClicks }
 
     private val deviceSelections = viewStream { view -> view.deviceSelections }
+
+    private val backPresses = viewStream { view -> view.backPresses }
+
+    private val clearPairingRequests = viewStream { view -> view.clearPairingRequests }
 
     private val userListStream = presenterStream { groupState.map { it.users }.replay(1) }
 
@@ -28,27 +31,14 @@ class GroupMonitoringPresenter(groupState: BehaviorRelay<GroupInfo>) : BasePrese
     }
 
     private val userStateStream = presenterStream {
-        userListStream.map { it.map { Pair<User, String?>(it, null) } }
-                .switchMap { users ->
-                    Observable.combineLatest(
-                            deviceSelections.scan(users) {
-                                a, b ->
-                                a.map {
-                                    when (it.first) {
-                                        b.first -> Pair(b.first, b.second)
-                                        else -> it.first to it.second
-                                    }
-                                }
-                            },
-                            deviceCache,
-                            { items, devices ->
-                                items.map {
-                                    val device = devices[it.second]
-                                    MonitoredUser(it.first, device?.status ?: DeviceStatus.NONE, it.second, device?.lastHeartRate ?: 0)
-                                }
-                            }
-                    )
+        Observable.combineLatest(
+                userListStream,
+                deviceCache,
+                { users, devices ->
+                    val t = devices.values.filter { it.user != null }.associate { it.user to it }
+                    users.map { MonitoredUser(it, t[it]?.status ?: DeviceStatus.NONE, t[it]?.address, t[it]?.lastHeartRate ?: 0) }
                 }
+        )
                 .replay(1)
     }
 
@@ -62,6 +52,19 @@ class GroupMonitoringPresenter(groupState: BehaviorRelay<GroupInfo>) : BasePrese
                 .publish()
     }
 
+    private val backReactionStream = presenterStream {
+        backPresses.withLatestFrom(userStateStream) { click, users ->
+            users.filter { it.status == DeviceStatus.NONE }
+        }
+                .map {
+                    when {
+                        it.isEmpty() -> GoBackResolution.GO_TO_ENTRY
+                        else -> GoBackResolution.FINISH
+                    }
+                }
+                .publish()
+    }
+
     override fun attachView(view: GroupMonitoringView) {
         viewSubscription.addAll(
                 userStateStream.observeOn(AndroidSchedulers.mainThread())
@@ -69,9 +72,20 @@ class GroupMonitoringPresenter(groupState: BehaviorRelay<GroupInfo>) : BasePrese
                 titleStream.observeOn(AndroidSchedulers.mainThread())
                         .subscribe(view.updateTitle),
                 shouldChooseDeviceStream.observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(view.selectDevice)
+                        .subscribe(view.selectDevice),
+                backReactionStream.observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(view.goBack),
+                deviceSelections.observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(view.pairDevice),
+                clearPairingRequests.observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(view.resetPairing)
         )
         super.attachView(view)
     }
 
+}
+
+enum class GoBackResolution {
+    FINISH,
+    GO_TO_ENTRY
 }

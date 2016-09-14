@@ -1,5 +1,6 @@
 package com.cardiomood.group.screen.monitoring
 
+import android.content.Intent
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -10,6 +11,7 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.cardiomood.group.R
 import com.cardiomood.group.api.User
+import com.cardiomood.group.screen.entry.EntryActivity
 import com.jakewharton.rxrelay.PublishRelay
 import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import ru.test.multydevicetest.DeviceService
@@ -30,16 +32,21 @@ class GroupMonitoringViewImpl(view: View, private val activity: GroupMonitoringA
 
     override val deviceSelections = PublishRelay.create<Pair<User, String>>()
 
-    // move this in router
-    override val devices = Observable.interval(0, 1000, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+    override val backPresses: PublishRelay<Unit> = PublishRelay.create()
+
+    override val clearPairingRequests: PublishRelay<Unit> = PublishRelay.create()
+
+    // todo: move this in router
+    override val devices = Observable.interval(100, 500, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
             .map {
                 activity.bluetoothLeService
             }
             .filterNotNull()
             .map { service ->
                 service.allAddresses
-                        .map { service.getDevice(it)?.toDeviceInfo() }
+                        .map { service.getDevice(it) }
                         .filterNotNull()
+                        .map { it.toDeviceInfo(service.getUser(it.address)) }
             }
             .distinctUntilChanged()
             .bindToLifecycle(view)
@@ -52,11 +59,33 @@ class GroupMonitoringViewImpl(view: View, private val activity: GroupMonitoringA
         adapter.updateContent(it)
     }
 
+    override val goBack = Action1<GoBackResolution> {
+        @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
+        when (it) {
+            GoBackResolution.GO_TO_ENTRY -> {
+                activity.bluetoothLeService?.doStop(true)
+                activity.startActivity(Intent(activity, EntryActivity::class.java))
+                activity.finish()
+            }
+            GoBackResolution.FINISH -> activity.finish()
+        }
+    }
+
+    override val pairDevice = Action1<Pair<User, String>> {
+        val (user, address) = it
+        activity.bluetoothLeService?.pairDeviceWithUser(address, user)
+    }
+
+    override val resetPairing = Action1<Unit> {
+        activity.bluetoothLeService?.clearDevicePairing()
+    }
+
     override val selectDevice = Action1<Pair<User, List<String>>> {
         val (user, usedAddresses) = it
         activity.doScan(true)
         activity.bluetoothLeService?.let { service ->
             val adapter = DeviceListAdapter(view, service, usedAddresses)
+            adapter.startUpdates()
             AlertDialog.Builder(view.context)
                     .setTitle("Select device")
                     .setAdapter(adapter) { dlg, index ->
@@ -69,8 +98,6 @@ class GroupMonitoringViewImpl(view: View, private val activity: GroupMonitoringA
                     }
                     .create()
                     .show()
-
-            adapter.startUpdates()
         }
     }
 
@@ -80,11 +107,10 @@ class GroupMonitoringViewImpl(view: View, private val activity: GroupMonitoringA
         recycler.adapter = adapter
     }
 
-    private fun SensorDevice.toDeviceInfo() = DeviceInfo(
+    private fun SensorDevice.toDeviceInfo(user: User?) = DeviceInfo(
             address = address,
             status = when {
-                isTransmitting -> DeviceStatus.CONNECTED
-                isConnected -> DeviceStatus.CONNECTED
+                isTransmitting || isConnected -> DeviceStatus.CONNECTED
                 isConnecting -> DeviceStatus.CONNECTING
                 isDisconnected -> DeviceStatus.DISCONNECTED
                 else -> DeviceStatus.NONE
@@ -92,7 +118,8 @@ class GroupMonitoringViewImpl(view: View, private val activity: GroupMonitoringA
             lastHeartRate = when {
                 isTransmitting -> lastHeartRate
                 else -> 0
-            }
+            },
+            user = user
     )
 
     private class DeviceListAdapter(val view: View, val service: DeviceService, val usedAddresses: List<String>) : BaseAdapter() {

@@ -15,7 +15,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -32,7 +31,6 @@ import ru.test.multydevicetest.DeviceService;
 import ru.test.multydevicetest.bluetooth.BluetoothGattWrapper;
 import ru.test.multydevicetest.bluetooth.BluetoothStat;
 import ru.test.multydevicetest.bluetooth.SensorDevice;
-import ru.test.multydevicetest.utils.Utils;
 
 /**
  * Created by Bes on 17.08.2016.
@@ -244,41 +242,41 @@ public class OverviewManager implements IDeviceProvider{
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        activity.getMenuInflater().inflate(R.menu.main, menu);
+        activity.getMenuInflater().inflate(R.menu.group_monitoring, menu);
         scanMenu = menu;
-        if (!isScanning) {
-            menu.findItem(R.id.menu_stop).setVisible(false);
-            menu.findItem(R.id.menu_scan).setVisible(true);
-        } else {
-            menu.findItem(R.id.menu_stop).setVisible(true);
-            menu.findItem(R.id.menu_scan).setVisible(false);
-        }
+//        if (!isScanning) {
+//            menu.findItem(R.id.menu_stop).setVisible(false);
+//            menu.findItem(R.id.menu_scan).setVisible(true);
+//        } else {
+//            menu.findItem(R.id.menu_stop).setVisible(true);
+//            menu.findItem(R.id.menu_scan).setVisible(false);
+//        }
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_scan:
-                doScan(true);
-                break;
-            case R.id.menu_stop:
-                doScan(false);
-                break;
-            case R.id.menu_exit:
-                if (bluetoothService != null) {
-                    Utils.execInNewThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            bluetoothService.doStop();
-                        }
-                    });
-
-                }
-                activity.finish();
-                break;
-        }
-        return true;
-    }
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.menu_scan:
+//                doScan(true);
+//                break;
+//            case R.id.menu_stop:
+//                doScan(false);
+//                break;
+//            case R.id.menu_exit:
+//                if (bluetoothService != null) {
+//                    Utils.execInNewThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            bluetoothService.doStop();
+//                        }
+//                    });
+//
+//                }
+//                activity.finish();
+//                break;
+//        }
+//        return true;
+//    }
 
     // Code to manage Service lifecycle.
     private final ServiceConnection serviceConnection = new ServiceConnection() {
@@ -414,34 +412,34 @@ public class OverviewManager implements IDeviceProvider{
                 }
             };
 
-    private void doScan(final boolean enable) {
-        if (enable) {
-            // Stops scanning after a pre-defined scan period.
-            scanHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    isScanning = false;
-                    bluetoothAdapter.stopLeScan(leScanCallback);
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (scanMenu != null) {
-                                scanMenu.findItem(R.id.menu_stop).setVisible(false);
-                                scanMenu.findItem(R.id.menu_scan).setVisible(true);
-                            }
-                        }
-                    });
-                }
-            }, SCAN_PERIOD);
-
-            isScanning = true;
-            bluetoothAdapter.startLeScan(leScanCallback);
-        } else {
-            isScanning = false;
-            bluetoothAdapter.stopLeScan(leScanCallback);
-        }
-        activity.invalidateOptionsMenu();
-    }
+//    private void doScan(final boolean enable) {
+//        if (enable) {
+//            // Stops scanning after a pre-defined scan period.
+//            scanHandler.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    isScanning = false;
+//                    bluetoothAdapter.stopLeScan(leScanCallback);
+//                    activity.runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            if (scanMenu != null) {
+//                                scanMenu.findItem(R.id.menu_stop).setVisible(false);
+//                                scanMenu.findItem(R.id.menu_scan).setVisible(true);
+//                            }
+//                        }
+//                    });
+//                }
+//            }, SCAN_PERIOD);
+//
+//            isScanning = true;
+//            bluetoothAdapter.startLeScan(leScanCallback);
+//        } else {
+//            isScanning = false;
+//            bluetoothAdapter.stopLeScan(leScanCallback);
+//        }
+//        activity.invalidateOptionsMenu();
+//    }
 
     @Override
     public SensorDevice getDevice(String address) {

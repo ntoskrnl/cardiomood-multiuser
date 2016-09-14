@@ -23,8 +23,8 @@
     <string name="latency_format" formatted="false">%.1fс</string>
     <string name="active_count_format" formatted="false">%d/%d</string>
     <string name="menu_scan">Find</string>
-    <string name="menu_stop">Stop</string>
+    <string name="menu_stop">Stop all</string>
     <string name="transmitting_status">Connected</string>
     <string name="closing_status">Closing</string>
-    <string name="menu_exit">exit</string>
+    <string name="menu_exit">Exit</string>
 </resources>

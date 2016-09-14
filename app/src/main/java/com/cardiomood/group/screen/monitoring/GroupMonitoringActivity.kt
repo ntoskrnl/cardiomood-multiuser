@@ -13,6 +13,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import com.cardiomood.group.R
 import com.cardiomood.group.mvp.BaseActivity
@@ -61,6 +63,12 @@ class GroupMonitoringActivity : BaseActivity() {
         }
     }
 
+    private val leScanCallback = BluetoothAdapter.LeScanCallback { device, rssi, scanRecord ->
+        runOnUiThread {
+            bluetoothLeService?.addDevice(device)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_monitoring)
@@ -72,8 +80,6 @@ class GroupMonitoringActivity : BaseActivity() {
             finish()
         }
 
-        // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
-        // BluetoothAdapter through BluetoothManager.
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         if (bluetoothManager.adapter != null) {
             bluetoothAdapter = bluetoothManager.adapter
@@ -98,12 +104,25 @@ class GroupMonitoringActivity : BaseActivity() {
         doScan(true)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.group_monitoring, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.stop -> {
+                view.clearPairingRequests.call(Unit)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         presenter.attachView(view)
 
-        // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
-        // fire an intent to display a dialog asking the user to grant permission to enable it.
         if (!bluetoothAdapter.isEnabled) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
@@ -130,15 +149,6 @@ class GroupMonitoringActivity : BaseActivity() {
         unbindService(serviceConnection)
         bluetoothLeService = null
         super.onDestroy()
-    }
-
-    // Device scan callback.
-    private val leScanCallback = BluetoothAdapter.LeScanCallback { device, rssi, scanRecord ->
-        runOnUiThread {
-            if (bluetoothLeService?.addDevice(device) ?: false) {
-//                    gridAdapter.addDevice(device.address)
-            }
-        }
     }
 
     fun doScan(enable: Boolean) {
@@ -169,9 +179,13 @@ class GroupMonitoringActivity : BaseActivity() {
         invalidateOptionsMenu()
     }
 
+
     override fun onBackPressed() {
-        bluetoothLeService?.doStop(true)
-        super.onBackPressed()
+        view.backPresses.call(Unit)
+        if (false) {
+            // avoiding warning
+            super.onBackPressed()
+        }
     }
 
     private fun diConfig() = Kodein {
