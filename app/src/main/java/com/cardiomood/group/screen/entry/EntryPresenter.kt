@@ -72,6 +72,7 @@ class EntryPresenter(private val model: EntryModel, private val groupState: Beha
                         .subscribe {
                             groupState.call(it)
                             router.gotoMainScreen(it)
+                            router.finish()
                         }
         )
         super.attachRouter(router)

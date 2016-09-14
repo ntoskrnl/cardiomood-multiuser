@@ -15,4 +15,7 @@ class EntryRouterImpl(private val context: NaviAppCompatActivity) : EntryRouter 
         context.startActivity(intent)
     }
 
+    override fun finish() {
+        context.finish()
+    }
 }

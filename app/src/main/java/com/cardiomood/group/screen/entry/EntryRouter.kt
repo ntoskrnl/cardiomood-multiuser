@@ -6,4 +6,6 @@ interface EntryRouter {
 
     fun gotoMainScreen(data: GroupInfo, noAnimation: Boolean = false)
 
+    fun finish()
+
 }
