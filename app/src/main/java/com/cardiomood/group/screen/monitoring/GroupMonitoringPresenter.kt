@@ -54,7 +54,7 @@ class GroupMonitoringPresenter(groupState: BehaviorRelay<GroupInfo>) : BasePrese
 
     private val backReactionStream = presenterStream {
         backPresses.withLatestFrom(userStateStream) { click, users ->
-            users.filter { it.status == DeviceStatus.NONE }
+            users.filter { it.status != DeviceStatus.NONE }
         }
                 .map {
                     when {

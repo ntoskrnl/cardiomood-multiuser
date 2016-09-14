@@ -9,7 +9,6 @@ class EntryRouterImpl(private val context: NaviAppCompatActivity) : EntryRouter 
 
     override fun gotoMainScreen(data: GroupInfo, noAnimation: Boolean) {
         val intent = Intent(context, GroupMonitoringActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         if (noAnimation) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         }

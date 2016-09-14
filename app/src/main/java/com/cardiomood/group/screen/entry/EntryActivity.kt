@@ -23,7 +23,7 @@ class EntryActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appInjector.inject(appKodein())
+        appInjector.inject(diConfig())
 
         if (groupInfo.hasValue()) {
             router.gotoMainScreen(groupInfo.value, true)
@@ -46,11 +46,6 @@ class EntryActivity : BaseActivity() {
     override fun onPause() {
         presenter.detachView()
         super.onPause()
-    }
-
-    override fun onDestroy() {
-        presenter.detachView()
-        super.onDestroy()
     }
 
     private fun diConfig() = Kodein {
