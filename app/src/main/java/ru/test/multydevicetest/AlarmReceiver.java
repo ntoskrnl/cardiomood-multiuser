@@ -18,9 +18,9 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        if(DeviceService.shouldRun()) {
+        if(DeviceService.Companion.shouldRun()) {
 
-            if (!DeviceService.isRunning(context)) {
+            if (!DeviceService.Companion.isRunning(context)) {
                 Log.w(TAG, "Service is not running while it should! Will try to restart");
                 Intent startIntent = new Intent(context, DeviceService.class);
                 startIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);

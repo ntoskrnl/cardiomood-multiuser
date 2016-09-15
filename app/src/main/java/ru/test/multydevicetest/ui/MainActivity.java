@@ -294,16 +294,16 @@ public class MainActivity extends ListActivity {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (SensorDevice.ACTION_GATT_CONNECTED.equals(action)) {
-                updateConnectionState(intent.getStringExtra(DeviceService.EXTRA_ADDRESS),R.string.connected);
+                updateConnectionState(intent.getStringExtra(DeviceService.Companion.getEXTRA_ADDRESS()),R.string.connected);
                 invalidateOptionsMenu();
             } else if (SensorDevice.ACTION_GATT_DISCONNECTED.equals(action)) {
-                updateConnectionState(intent.getStringExtra(DeviceService.EXTRA_ADDRESS),R.string.disconnected);
-                displayData(intent.getStringExtra(DeviceService.EXTRA_ADDRESS), "NA");
+                updateConnectionState(intent.getStringExtra(DeviceService.Companion.getEXTRA_ADDRESS()),R.string.disconnected);
+                displayData(intent.getStringExtra(DeviceService.Companion.getEXTRA_ADDRESS()), "NA");
             } else if (SensorDevice.ACTION_GATT_SERVICES_UNSUPPORTED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 //displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (SensorDevice.ACTION_DATA_AVAILABLE.equals(action)) {
-                displayData(intent.getStringExtra(DeviceService.EXTRA_ADDRESS), intent.getStringExtra(DeviceService.EXTRA_HEART_RATE));
+                displayData(intent.getStringExtra(DeviceService.Companion.getEXTRA_ADDRESS()), intent.getStringExtra(DeviceService.Companion.getEXTRA_HEART_RATE()));
             }
         }
     };

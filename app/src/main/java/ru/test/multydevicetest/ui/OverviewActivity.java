@@ -328,34 +328,34 @@ public class OverviewActivity extends AppCompatActivity implements IDeviceProvid
             final String action = intent.getAction();
             if (SensorDevice.ACTION_GATT_CONNECTED.equals(action)) {
                 gridAdapter.updateConnectionState(
-                        intent.getStringExtra(DeviceService.EXTRA_ADDRESS),
+                        intent.getStringExtra(DeviceService.Companion.getEXTRA_ADDRESS()),
                         true,
                         0);
                 invalidateOptionsMenu();
             } else if (SensorDevice.ACTION_GATT_DISCONNECTED.equals(action)) {
                 gridAdapter.updateConnectionState(
-                        intent.getStringExtra(DeviceService.EXTRA_ADDRESS),
+                        intent.getStringExtra(DeviceService.Companion.getEXTRA_ADDRESS()),
                         false,
                         0);
             } else if (SensorDevice.ACTION_GATT_SERVICES_UNSUPPORTED.equals(action)) {
-                gridAdapter.showUnsupported(intent.getStringExtra(DeviceService.EXTRA_ADDRESS));
+                gridAdapter.showUnsupported(intent.getStringExtra(DeviceService.Companion.getEXTRA_ADDRESS()));
             } else if (SensorDevice.ACTION_DATA_AVAILABLE.equals(action)) {
                 gridAdapter.displayData(
-                        intent.getStringExtra(DeviceService.EXTRA_ADDRESS),
-                        intent.getStringExtra(DeviceService.EXTRA_HEART_RATE),
-                        intent.getLongExtra(DeviceService.EXTRA_LATENCY, -1)
+                        intent.getStringExtra(DeviceService.Companion.getEXTRA_ADDRESS()),
+                        intent.getStringExtra(DeviceService.Companion.getEXTRA_HEART_RATE()),
+                        intent.getLongExtra(DeviceService.Companion.getEXTRA_LATENCY(), -1)
                 );
-            } else if (DeviceService.INFO_STATISTICS.equals(action)) {
+            } else if (DeviceService.Companion.getINFO_STATISTICS().equals(action)) {
                 showStatistics(
-                        intent.getIntExtra(DeviceService.EXTRA_TOTAL, -1),
-                        intent.getIntExtra(DeviceService.EXTRA_ACTIVE, -1),
-                        intent.getIntExtra(DeviceService.EXTRA_MAX_ACTIVE, -1),
-                        intent.getLongExtra(DeviceService.EXTRA_MAX_LATENCY, -1)
+                        intent.getIntExtra(DeviceService.Companion.getEXTRA_TOTAL(), -1),
+                        intent.getIntExtra(DeviceService.Companion.getEXTRA_ACTIVE(), -1),
+                        intent.getIntExtra(DeviceService.Companion.getEXTRA_MAX_ACTIVE(), -1),
+                        intent.getLongExtra(DeviceService.Companion.getEXTRA_MAX_LATENCY(), -1)
                 );
             } else if (SensorDevice.ACTION_BATTERY_LEVEL.equals(action)) {
                 gridAdapter.displayBattery(
-                        intent.getStringExtra(DeviceService.EXTRA_ADDRESS),
-                        intent.getIntExtra(DeviceService.EXTRA_BATTERY_LEVEL, -1)
+                        intent.getStringExtra(DeviceService.Companion.getEXTRA_ADDRESS()),
+                        intent.getIntExtra(DeviceService.Companion.getEXTRA_BATTERY_LEVEL(), -1)
                 );
             } else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
@@ -378,7 +378,7 @@ public class OverviewActivity extends AppCompatActivity implements IDeviceProvid
         intentFilter.addAction(SensorDevice.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(SensorDevice.ACTION_GATT_SERVICES_UNSUPPORTED);
         intentFilter.addAction(SensorDevice.ACTION_DATA_AVAILABLE);
-        intentFilter.addAction(DeviceService.INFO_STATISTICS);
+        intentFilter.addAction(DeviceService.Companion.getINFO_STATISTICS());
         intentFilter.addAction(SensorDevice.ACTION_BATTERY_LEVEL);
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         return intentFilter;
