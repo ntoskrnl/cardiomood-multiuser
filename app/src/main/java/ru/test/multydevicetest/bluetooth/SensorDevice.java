@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
 import android.util.Log;
 
-import com.cardiomood.group.R;
+import com.cardiomood.multiuser.R;
 
 import java.lang.reflect.Constructor;
 import java.util.Calendar;

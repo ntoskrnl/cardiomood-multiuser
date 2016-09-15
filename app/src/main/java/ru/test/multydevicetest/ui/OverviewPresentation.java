@@ -9,7 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
-import com.cardiomood.group.R;
+import com.cardiomood.multiuser.R;
 
 /**
  * Created by Bes on 17.08.2016.

@@ -13,10 +13,10 @@ import android.os.Binder
 import android.os.IBinder
 import android.os.PowerManager
 import android.util.Log
-import com.cardiomood.group.R
-import com.cardiomood.group.api.Api
-import com.cardiomood.group.api.User
-import com.cardiomood.group.screen.monitoring.GroupMonitoringActivity
+import com.cardiomood.multiuser.R
+import com.cardiomood.multiuser.api.Api
+import com.cardiomood.multiuser.api.User
+import com.cardiomood.multiuser.screen.monitoring.GroupMonitoringActivity
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance

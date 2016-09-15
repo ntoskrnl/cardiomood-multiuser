@@ -25,7 +25,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cardiomood.group.R;
+import com.cardiomood.multiuser.R;
 
 import java.util.ArrayList;
 

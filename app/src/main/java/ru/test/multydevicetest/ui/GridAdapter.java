@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.cardiomood.group.R;
+import com.cardiomood.multiuser.R;
 
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;

@@ -2,10 +2,10 @@ package ru.test.multydevicetest
 
 import android.os.SystemClock
 import android.util.Log
-import com.cardiomood.group.api.Api
-import com.cardiomood.group.api.DataRequest
-import com.cardiomood.group.api.RealTimeUploadChunk
-import com.cardiomood.group.api.User
+import com.cardiomood.multiuser.api.Api
+import com.cardiomood.multiuser.api.DataRequest
+import com.cardiomood.multiuser.api.RealTimeUploadChunk
+import com.cardiomood.multiuser.api.User
 import ru.test.multydevicetest.bluetooth.HeartRateListener
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
@@ -64,12 +64,15 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
         }
     }
 
-    fun getUser(address: String) = data[address]?.user
+    fun getUser(address: String) = synchronized(data) {
+        data[address]?.user
+    }
 
     private fun startRealTimeUpload() {
         subscription.addAll(
                 Observable.interval(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .map { prepareUploadChunk() }
+                        .filter { it.isNotEmpty() }
                         .onBackpressureLatest()
                         .flatMap { request ->
                             api.uploadRealTime(DataRequest(request))
@@ -104,6 +107,7 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
                                 times = it.times.take(50)
                         )
                     }
+                    .filter { it.rrs.isNotEmpty() }
         }
     }
 
@@ -112,9 +116,9 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
             request.forEach { point ->
                 val userData = data.values.firstOrNull { it.user.id == point.userId }
                 if (userData != null) {
-                    for (i in 0..point.rrs.size-1)
+                    for (i in 0..point.rrs.size - 1)
                         userData.rrs.removeAt(0)
-                    for (i in 0..point.times.size-1)
+                    for (i in 0..point.times.size - 1)
                         userData.times.removeAt(0)
                 }
             }
@@ -132,5 +136,3 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
             val times: MutableList<Long> = ArrayList()
     )
 }
-
-

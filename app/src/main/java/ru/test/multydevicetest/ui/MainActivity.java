@@ -23,7 +23,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cardiomood.group.R;
+import com.cardiomood.multiuser.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;

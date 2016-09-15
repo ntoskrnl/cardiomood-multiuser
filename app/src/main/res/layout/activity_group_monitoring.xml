@@ -4,4 +4,4 @@
     android:id="@+id/users_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.cardiomood.group.screen.monitoring.GroupMonitoringActivity" />
+    tools:context="com.cardiomood.multiuser.screen.monitoring.GroupMonitoringActivity" />

@@ -1,18 +1,28 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: "io.mironov.smuggler"
+apply plugin: 'io.mironov.smuggler'
+apply plugin: 'io.fabric'
+
+apply from: "../gradle/utils.gradle"
+
+ext.gitHash = getGitHash()
 
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.2"
     defaultConfig {
-        applicationId "com.cardiomood.group"
+        applicationId "com.cardiomood.multiuser"
         minSdkVersion 18
         targetSdkVersion 24
         versionCode 1
-        versionName "1.0"
+        versionName "0.1.0-$gitHash"
+
+        buildConfigField "String", "GitHash", "\"$gitHash\""
     }
     buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -22,6 +32,7 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 }
+
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -62,4 +73,8 @@ dependencies {
     compile 'com.polidea.rxandroidble:rxandroidble:1.0.2'
 
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.7.0@aar'
+
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.3@aar') {
+        transitive = true;
+    }
 }
