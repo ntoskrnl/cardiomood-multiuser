@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'io.mironov.smuggler'
 apply plugin: 'io.fabric'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 apply from: "../gradle/utils.gradle"
 
@@ -17,7 +18,7 @@ android {
         versionCode 1
         versionName "0.1.0-$gitHash"
 
-        buildConfigField "String", "GitHash", "\"$gitHash\""
+        buildConfigField "String", "GIT_HASH", "\"$gitHash\""
     }
     buildTypes {
         debug {
@@ -77,4 +78,6 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.6.3@aar') {
         transitive = true;
     }
+
+    compile 'com.jakewharton.timber:timber:4.3.0'
 }

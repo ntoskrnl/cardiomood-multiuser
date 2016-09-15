@@ -23,6 +23,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.util.*
 
 class App : Application(), KodeinAware, PresenterScopeAware {
@@ -71,6 +72,11 @@ class App : Application(), KodeinAware, PresenterScopeAware {
         Stetho.initializeWithDefaults(this)
 
         Fabric.with(this, Crashlytics())
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
+        Timber.plant(CrashlyticsTree(BuildConfig.DEBUG))
     }
 
     override fun onTerminate() {

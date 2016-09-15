@@ -88,7 +88,7 @@ class DeviceService : Service(), IDeviceEventListener {
     }
 
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStart")
         initialize()
         isStarted = true
