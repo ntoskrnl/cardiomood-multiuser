@@ -6,8 +6,6 @@ apply plugin: 'com.getkeepsafe.dexcount'
 
 apply from: "../gradle/utils.gradle"
 
-ext.gitHash = getGitHash()
-
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.2"
@@ -17,9 +15,9 @@ android {
         minSdkVersion 18
         targetSdkVersion 24
         versionCode 1
-        versionName "0.1.0-$gitHash"
+        versionName "0.1.0-${getGitHash()}"
 
-        buildConfigField "String", "GIT_HASH", "\"$gitHash\""
+        buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
     }
 
     signingConfigs {

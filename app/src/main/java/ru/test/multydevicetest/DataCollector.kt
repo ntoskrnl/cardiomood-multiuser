@@ -13,6 +13,7 @@ import rx.lang.kotlin.filterNotNull
 import rx.lang.kotlin.onErrorReturnNull
 import rx.schedulers.Schedulers
 import rx.subscriptions.CompositeSubscription
+import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -106,6 +107,11 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
                                 rrs = it.rrs.take(50),
                                 times = it.times.take(50)
                         )
+                        .apply {
+                            assert(it.rrs.size == it.times.size) {
+                                "Data points rrs and times mismatch"
+                            }
+                        }
                     }
                     .filter { it.rrs.isNotEmpty() }
         }
@@ -116,9 +122,15 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
             request.forEach { point ->
                 val userData = data.values.firstOrNull { it.user.id == point.userId }
                 if (userData != null) {
-                    for (i in 0..point.rrs.size - 1)
+                    if (userData.rrs.size < point.rrs.size) {
+                        Timber.d("Inconsistent state for user ${userData.user.email}: rrs = ${userData.rrs} vs ${point.rrs}")
+                    }
+                    if (userData.times.size < point.times.size) {
+                        Timber.d("Inconsistent state for user ${userData.user.email}: times = ${userData.times} vs ${point.times}")
+                    }
+                    for (i in 1..point.rrs.size)
                         userData.rrs.removeAt(0)
-                    for (i in 0..point.times.size - 1)
+                    for (i in 1..point.times.size)
                         userData.times.removeAt(0)
                 }
             }
