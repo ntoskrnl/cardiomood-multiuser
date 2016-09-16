@@ -1,3 +1,7 @@
+plugins {
+    id 'com.gladed.androidgitversion' version '0.2.20'
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'io.mironov.smuggler'
@@ -14,8 +18,8 @@ android {
         applicationId "com.cardiomood.multiuser"
         minSdkVersion 18
         targetSdkVersion 24
-        versionCode 1
-        versionName "0.1.0-${getGitHash()}"
+        versionName androidGitVersion.name()
+        versionCode androidGitVersion.code()
 
         buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
     }
@@ -44,6 +48,17 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+
+
+    androidGitVersion {
+        prefix ''
+        onlyIn 'app'
+        multiplier 10000
+        parts 3
+        baseCode 1
+        hideBranches = []
+        format = '%tag%%.count%%<commit>%%-branch%%...dirty%'
     }
 
     applicationVariants.all { variant ->

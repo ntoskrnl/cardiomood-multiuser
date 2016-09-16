@@ -75,15 +75,7 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
                         .map { prepareUploadChunk() }
                         .filter { it.isNotEmpty() }
                         .onBackpressureLatest()
-                        .flatMap { request ->
-                            api.uploadRealTime(DataRequest(request))
-                                    .subscribeOn(Schedulers.io())
-                                    .map { request }
-                                    .doOnError {
-                                        it.printStackTrace()
-                                    }
-                                    .onErrorReturnNull()
-                        }
+                        .flatMap({ submitChunk(it) }, 1)
                         .filterNotNull()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
@@ -94,6 +86,16 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
 
     private fun stopRealTimeUpload() {
         subscription.clear()
+    }
+
+    private fun submitChunk(request: List<RealTimeUploadChunk>): Observable<List<RealTimeUploadChunk>?> {
+        return api.uploadRealTime(DataRequest(request))
+                .subscribeOn(Schedulers.io())
+                .map { request }
+                .doOnError {
+                    Timber.i(it, "Failed to send data")
+                }
+                .onErrorReturnNull()
     }
 
     private fun prepareUploadChunk(): List<RealTimeUploadChunk> {
@@ -107,11 +109,11 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
                                 rrs = it.rrs.take(50),
                                 times = it.times.take(50)
                         )
-                        .apply {
-                            assert(it.rrs.size == it.times.size) {
-                                "Data points rrs and times mismatch"
-                            }
-                        }
+                                .apply {
+                                    assert(it.rrs.size == it.times.size) {
+                                        "Data points rrs and times mismatch"
+                                    }
+                                }
                     }
                     .filter { it.rrs.isNotEmpty() }
         }
