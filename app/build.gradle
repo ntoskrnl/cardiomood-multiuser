@@ -57,8 +57,8 @@ android {
         multiplier 10000
         parts 3
         baseCode 1
-        hideBranches = []
-        format = '%tag%%.count%%<commit>%%-branch%%...dirty%'
+        hideBranches = ['master']
+        format = '%tag%%.count%%-commit%%-branch%%(dirty)%'
     }
 
     applicationVariants.all { variant ->
