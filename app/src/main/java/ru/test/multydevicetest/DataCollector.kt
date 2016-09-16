@@ -35,7 +35,8 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
                     userData.startTimestamp = uptime
                 }
                 userData.rrs.addAll(rrIntervals)
-                var lastTimestamp = userData.lastTimestamp
+                uptime - userData.startTimestamp
+                var lastTimestamp = (uptime - userData.startTimestamp).coerceAtLeast(userData.lastTimestamp + 1) - 1
                 rrIntervals.forEach {
                     userData.times.add(lastTimestamp)
                     lastTimestamp += it
