@@ -50,17 +50,6 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-
-    androidGitVersion {
-        prefix ''
-        onlyIn 'app'
-        multiplier 10000
-        parts 3
-        baseCode 1
-        hideBranches = ['master']
-        format = '%tag%%.count%%-commit%%-branch%%(dirty)%'
-    }
-
     applicationVariants.all { variant ->
         def appName = "cardiomood-multi-user"
 
@@ -69,6 +58,16 @@ android {
             output.outputFile = new File(output.outputFile.parent, newApkName)
         }
     }
+}
+
+androidGitVersion {
+    prefix ''
+    onlyIn 'app'
+    multiplier 10000
+    parts 3
+    baseCode 1
+    hideBranches = ['master']
+    format = '%tag%%.count%%-commit%%-branch%%(dirty)%'
 }
 
 
