@@ -15,6 +15,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.Toast
 import com.cardiomood.multiuser.R
 import com.cardiomood.multiuser.mvp.BaseActivity
@@ -42,23 +43,13 @@ class GroupMonitoringActivity : BaseActivity() {
     private val scanHandler = Handler()
     private var isScanning = false
 
-    // Code to manage Service lifecycle.
     private val serviceConnection = object : ServiceConnection {
 
         override fun onServiceConnected(componentName: ComponentName, service: IBinder) {
-//            Log.d(TAG, "connected to service")
             bluetoothLeService = (service as DeviceService.LocalBinder).service
-
-
-//            mLeDeviceListAdapter.clear()
-//
-//            for (address in mBluetoothLeService.getAllAddresses()) {
-//                mLeDeviceListAdapter.addDevice(address)
-//            }
         }
 
         override fun onServiceDisconnected(componentName: ComponentName) {
-//            Log.d(TAG, "disconnected from service")
             bluetoothLeService = null
         }
     }
@@ -72,6 +63,8 @@ class GroupMonitoringActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_monitoring)
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         injector.inject(diConfig())
 
@@ -130,7 +123,6 @@ class GroupMonitoringActivity : BaseActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        // User chose not to enable Bluetooth.
         if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
             Toast.makeText(this, "BLUETOOTH must be turned on", Toast.LENGTH_SHORT).show()
             finish()
@@ -160,12 +152,6 @@ class GroupMonitoringActivity : BaseActivity() {
                     {
                         isScanning = false
                         bluetoothAdapter.stopLeScan(leScanCallback)
-                        runOnUiThread {
-//                    if (scanMenu != null) {
-//                        scanMenu.findItem(R.id.menu_stop).setVisible(false)
-//                        scanMenu.findItem(R.id.menu_scan).setVisible(true)
-//                    }
-                        }
                     },
                     10000
             )
@@ -176,7 +162,6 @@ class GroupMonitoringActivity : BaseActivity() {
             isScanning = false
             bluetoothAdapter.stopLeScan(leScanCallback)
         }
-        invalidateOptionsMenu()
     }
 
 

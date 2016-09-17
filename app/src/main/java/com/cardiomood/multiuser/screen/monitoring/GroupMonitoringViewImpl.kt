@@ -95,6 +95,7 @@ class GroupMonitoringViewImpl(view: View, private val activity: GroupMonitoringA
                     }
                     .setOnDismissListener {
                         adapter.stopUpdates()
+                        activity.doScan(false)
                     }
                     .create()
                     .show()
