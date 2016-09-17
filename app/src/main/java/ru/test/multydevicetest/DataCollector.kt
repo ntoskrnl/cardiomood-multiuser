@@ -73,10 +73,8 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
     private fun startRealTimeUpload() {
         subscription.addAll(
                 Observable.interval(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                        .map { prepareUploadChunk() }
-                        .filter { it.isNotEmpty() }
                         .onBackpressureLatest()
-                        .flatMap({ submitChunk(it) }, 1)
+                        .flatMap({ submitChunk() }, 1)
                         .filterNotNull()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
@@ -89,14 +87,20 @@ internal class DataCollector(private val api: Api) : HeartRateListener {
         subscription.clear()
     }
 
-    private fun submitChunk(request: List<RealTimeUploadChunk>): Observable<List<RealTimeUploadChunk>?> {
-        return api.uploadRealTime(DataRequest(request))
-                .subscribeOn(Schedulers.io())
-                .map { request }
-                .doOnError {
-                    Timber.i(it, "Failed to send data")
-                }
-                .onErrorReturnNull()
+    private fun submitChunk(): Observable<List<RealTimeUploadChunk>?> {
+        val request = prepareUploadChunk()
+        return when {
+            request.isNotEmpty() -> {
+                api.uploadRealTime(DataRequest(request))
+                        .subscribeOn(Schedulers.io())
+                        .map { request }
+                        .doOnError {
+                            Timber.i(it, "Failed to send data")
+                        }
+                        .onErrorReturnNull()
+            }
+            else -> Observable.empty()
+        }
     }
 
     private fun prepareUploadChunk(): List<RealTimeUploadChunk> {
